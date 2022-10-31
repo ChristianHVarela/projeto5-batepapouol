@@ -10,17 +10,31 @@
     <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
-    <div class="cabecalho">
-      <img class="logo" src="./assets/logo 1.svg" alt="" />
-      <img class="vector" src="./assets/Vector.svg" alt="" />
+    <div class="tela-mensagens escondido">
+      <div class="cabecalho">
+        <img class="logo" src="./assets/logo 1.svg" alt="" />
+        <img class="vector" src="./assets/Vector.svg" alt="" />
+      </div>
+      <div class="messages"></div>
+      <div class="rodape">
+        <input type="text" placeholder="Escreva aqui ..." />
+        <ion-icon
+          onclick="enviarMensagem()"
+          name="paper-plane-outline"
+        ></ion-icon>
+      </div>
     </div>
-    <div class="messages"></div>
-    <div class="rodape">
-      <input type="text" placeholder="Escreva aqui ..." />
-      <ion-icon
-        onclick="enviarMensagem()"
-        name="paper-plane-outline"
-      ></ion-icon>
+    <div class="tela-login">
+      <div class="cabecalho-login">
+        <img src="./assets/logo 1.svg" alt="" />
+      </div>
+      <div class="container-login">
+        <div class="pre-login">
+          <input type="text" placeholder="Digite seu nome" />
+          <button accesskey="">Entrar</button>
+        </div>
+        <div class="loadingscreen escondido"></div>
+      </div>
     </div>
     <script
       type="module"

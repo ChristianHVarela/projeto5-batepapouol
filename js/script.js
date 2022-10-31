@@ -6,30 +6,59 @@ let urlStatus = "https://mock-api.driven.com.br/api/v6/uol/status";
 let loginSuccess = false;
 
 window.onload = (e) => {
-  login();
-  console.log(loginSuccess);
-  if (loginSuccess) {
-    manterConexao();
-    renderMessages();
-    setIntervalMessages();
-  }
+  document.querySelector(".container-login button").onclick = function (e) {
+    document.querySelector(".pre-login").classList.toggle("escondido");
+    document.querySelector(".loadingscreen").classList.toggle("escondido");
+    const val = document.querySelector(".container-login input").value;
+    if (val) {
+      login(val);
+    } else {
+      document.querySelector(".pre-login").classList.toggle("escondido");
+      document.querySelector(".loadingscreen").classList.toggle("escondido");
+      document
+        .querySelector(".container-login input")
+        .classList.add("border-red");
+    }
+  };
+
+  document
+    .querySelector(".container-login input")
+    .addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        document.querySelector(".container-login button").click();
+      }
+    });
 };
 
-function login() {
-  const nomePrompt = prompt("Qual é o seu lindo nome?");
-  const nomeStringfy = `{"name": "${nomePrompt}"}`;
+function configMensagens() {
+  manterConexao();
+  renderMessages();
+  setIntervalMessages();
+}
+
+function login(nome) {
+  const nomeStringfy = `{"name": "${nome}"}`;
   nomeJSON = JSON.parse(nomeStringfy);
   axios
     .post(urlParticipants, nomeJSON)
     .then((response) => {
       console.log("login ok ");
       console.log(response);
+      document.querySelector(".tela-login").classList.toggle("escondido");
+      document.querySelector(".tela-mensagens").classList.toggle("escondido");
+      console.log(nomeJSON);
+      configMensagens();
     })
     .catch((error) => {
       console.log("login error ");
       console.log(error);
+      document.querySelector(".pre-login").classList.toggle("escondido");
+      document.querySelector(".loadingscreen").classList.toggle("escondido");
+      document
+        .querySelector(".container-login input")
+        .classList.add("border-red");
     });
-  loginSuccess = true;
 }
 
 function manterConexao() {
@@ -43,6 +72,9 @@ function manterConexao() {
       .catch((error) => {
         console.log("status error ");
         console.log(error);
+        document.querySelector(".tela-login").classList.toggle("escondido");
+        document.querySelector(".tela-mensagens").classList.toggle("escondido");
+        clearInterval();
       });
   }, 5000);
 }
@@ -81,19 +113,27 @@ function setIntervalMessages() {
 function appendMessages(messages) {
   let messagesHTML = "";
   messages.map((mess, index) => {
-    messagesHTML += `<div class="mensagem-caixa ${
-      mess.to === "Todos" ? "" : "messagem-private"
-    }">
-    <p>
-      <span class="time ${
-        messages.length - 1 === index ? "last-message" : ""
-      }">(${mess.time})</span>
-      <span class="name">${mess.from}</span> ${
-      mess.to === "Todos" ? "para" : "reservamente para"
+    if (mess.to === "Todos") {
+      messagesHTML += `<div class="mensagem-caixa">
+      <p>
+        <span class="time ${
+          messages.length - 1 === index ? "last-message" : ""
+        }">(${mess.time})</span>
+        <span class="name">${mess.from}</span> para
+        <span class="name">${mess.to}</span>: ${mess.text}
+      </p>
+    </div>`;
+    } else if (mess.to === nomeJSON.name) {
+      messagesHTML += `<div class="mensagem-caixa messagem-private">
+      <p>
+        <span class="time ${
+          messages.length - 1 === index ? "last-message" : ""
+        }">(${mess.time})</span>
+        <span class="name">${mess.from}</span> reservamente para
+        <span class="name">${mess.to}</span>: ${mess.text}
+      </p>
+    </div>`;
     }
-      <span class="name">${mess.to}</span>: ${mess.text}
-    </p>
-  </div>`;
   });
   document.querySelector(".messages").innerHTML = messagesHTML;
 }
@@ -106,7 +146,6 @@ function enviarMensagem() {
     text: mensagem,
     type: "message",
   };
-  console.log(mensagemJSON);
   axios
     .post(urlMessages, mensagemJSON)
     .then((response) => {
@@ -115,6 +154,8 @@ function enviarMensagem() {
     })
     .catch((error) => {
       console.log(error);
+      document.querySelector(".tela-login").classList.toggle("escondido");
+      document.querySelector(".tela-mensagens").classList.toggle("escondido");
     });
   document.querySelector(".rodape input").value = "";
 }
